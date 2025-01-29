@@ -4,8 +4,18 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-//TODO: set time out for server
-//
+import java.util.HashSet;
+//TODO: create multithreading to allow multi user and multiCollections
+/*
+ * Command format:
+ * QUIT: quit
+ * SET key value: sets key associated with value
+ * GET key: gets value associated with Key
+ * DELETE key: removes key 
+ * SSET ADD value: adds value to a Set
+ * SSET DELTE value: deletes value from a set
+ * SSET CONTAINS value: checks if value is in a set
+ */
 public class App {
     public static void main(String[] args) throws Exception {
         System.out.println("=====================REDIS RUNNING=====================R");
@@ -13,18 +23,24 @@ public class App {
         ServerSocket serverSocket = null;
         Parser parser;
         int port = 6379;
+        //time out set as 30 minutes
+        int timeoutMillis = 1800000;
         //key -> value
         HashMap<String, String> map;
+        HashSet<String> set;
+        
         try{
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
+            serverSocket.setSoTimeout(timeoutMillis);
+            map = new HashMap<>();
+            set = new HashSet<>();
             while (true) {
                 try {
                     clientSocket = serverSocket.accept();
                     System.out.println("Client connected: " + clientSocket.getRemoteSocketAddress());
                     clientSocket.getOutputStream().write("======Welcome to Redis=======\r\n".getBytes());
-                    map = new HashMap<>();
-                    parser = new Parser(map);
+                    parser = new Parser(map, set);
                     handleClient(clientSocket, parser);
                     System.out.println("=======Quit=======");
                     break;
