@@ -1,18 +1,26 @@
-## Getting Started
+![Languages](https://img.shields.io/badge/Languages-Java-white) ![REDIS](https://img.shields.io/badge/REDIS-white) 
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+# REDIS
 
-## Folder Structure
+This is an implementation of REDIS in java, a type of NoSQL database.
 
-The workspace contains two folders by default, where:
+# About The Project:
+I had a lot of fun designing this REDIS, learning about concurrency and new thread-safe data structures. Feel free to use this! It's light weight and easy to use.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+# Setup:
+```bash
+#Clone the repo
+git clone https://github.com/Chieler/Redis.git
+cd Redis/src
+javac Server.java
+java Server
+```
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+```bash
+#In a seperate terminal:
+nc localost 6379
+```
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+And your done! The commands are:
 
-## Dependency Management
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
