@@ -23,4 +23,12 @@ nc localost 6379
 
 And your done! The commands are:
 
+```bash
+# Sets key value
+SET key value
+#Deletes key alongside associated value
+DELETE key
+#Gets value associated with key
+GET key
+```
 
