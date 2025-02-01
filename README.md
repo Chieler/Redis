@@ -32,3 +32,5 @@ DELETE key
 GET key
 ```
 
+Enjoy!
+
