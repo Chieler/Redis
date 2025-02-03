@@ -18,7 +18,10 @@ public class Server {
     //change the to set pool size
     private static final int THREAD_POOL_SIZE = 10;
     private static volatile int port = DEFAULT_PORT;
-    private static final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+    //Datastore, key to structure
+    private final static DataStore ds = new DataStore();
+
+    private static final ConcurrentHashMap<String, String> map = ds.stringStore;
     //ThreadPool executtor to manage threads
     private static final ExecutorService threadPool = new ThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, 
     new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.CallerRunsPolicy());
@@ -45,7 +48,7 @@ public class Server {
                     //we create a new client when one wishes to connect
                     Socket clientSocket = serverSocket.accept();
                     //then create a new thread for the client to run on
-                    threadPool.execute(new ClientHandler(clientSocket, map));
+                    threadPool.execute(new ClientHandler(clientSocket, map, ds));
                 }catch(Exception e){
                     System.err.println("Error accepting client connection: " + e.getMessage());
                 }
@@ -82,10 +85,12 @@ public class Server {
         private final Socket clientSocket;
         private final ConcurrentHashMap<String, String> map;
         private final ConcurrentParser parser;
-        public ClientHandler(Socket socket, ConcurrentHashMap<String, String> map){
+        private final DataStore ds;
+        public ClientHandler(Socket socket, ConcurrentHashMap<String, String> map, DataStore ds){
             this.clientSocket = socket;
             this.map = map;
-            parser = new ConcurrentParser(map);
+            parser = new ConcurrentParser(map, ds);
+            this.ds = ds;
         }
         
         @Override

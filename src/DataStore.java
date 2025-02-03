@@ -21,7 +21,7 @@ public class DataStore {
 
 
     //map for storing Strings
-    private final ConcurrentHashMap<String, String> stringStore = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, String> stringStore = new ConcurrentHashMap<>();
     //map that maps the name to the data type
     private final ConcurrentHashMap<String ,DataType> typeMap = new ConcurrentHashMap<>();
     //map that stores all collection
@@ -34,14 +34,23 @@ public class DataStore {
         typeMap.put(key, DataType.LIST);
     }
     public void lPush(String key, String value){
-        if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.LIST)) throw new IllegalArgumentException("Key is not a List");;
+        if(!typeMap.contains(key)){
+            createList(key);
+        }else if(!typeMap.get(key).equals(DataType.LIST)){
+            throw new IllegalArgumentException("Key is not a List");
+        }
         ListCollection list = (ListCollection)collectionStore.get(key);
         list.list.add(0, value);
     }
     public String lPop(String key){
         if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.LIST)) throw  new IllegalArgumentException("Key is not a List");
         ListCollection list = (ListCollection) collectionStore.get(key);
-        return list.list.removeFirst();
+        if(list.list.size()>=1){
+            return list.list.removeFirst();
+        }else{
+            throw new IllegalArgumentException("Lisr is not long enough");
+        }
+
     }
     public int lSize(String key){
         if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.LIST)) throw  new IllegalArgumentException("Key is not a List");
@@ -57,14 +66,23 @@ public class DataStore {
     }
     //takes in map name, key name, and value name
     public void hSet(String key, String field, String value){
-        if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.HASH)) throw new IllegalArgumentException("Key is not a Hash");
+        if(!typeMap.containsKey(key)){
+            createHash(key);
+        }else if(!typeMap.get(key).equals(DataType.HASH)){
+            throw new IllegalArgumentException("Key is not a Hash");
+        }
         HashCollection hash = (HashCollection)collectionStore.get(key);
         hash.map.put(field, value);
     }
     public String hGet(String key, String field){
         if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.HASH)) throw new IllegalArgumentException("Key is not a Hash");
         HashCollection hashCollection = (HashCollection)collectionStore.get(key);
-        return hashCollection.map.get(field);
+        if(hashCollection.map.containsKey(field)){
+            return hashCollection.map.get(field);
+        }else{
+            throw new IllegalArgumentException("Key DNE");
+        }
+        
     }
     public void hDelete(String key, String field){
         if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.HASH)) throw new IllegalArgumentException("Key is not a Hash");
@@ -83,8 +101,15 @@ public class DataStore {
         typeMap.put(key, DataType.SET);
     }
     public void sAdd(String key, String value){
-        if(!typeMap.getOrDefault(key, DataType.STRING).equals(DataType.SET)) throw new IllegalArgumentException("Key is not a Set");
-        SetCollection set = (SetCollection)collectionStore.get(key);
+        // If key doesn't exist in typeMap, create new hash
+        if (!typeMap.containsKey(key)) {
+            createSet(key);
+        } else if (!typeMap.get(key).equals(DataType.SET)) {
+            // If key exists but isn't a hash, that's an error
+            throw new IllegalArgumentException("Key exists but is not a SET");
+        }
+        
+        SetCollection set = (SetCollection) collectionStore.get(key);
         set.set.add(value);
     }
 
